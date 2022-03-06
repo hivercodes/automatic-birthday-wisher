@@ -37,39 +37,46 @@ todays_day = todays_date.day
 with open("birthdays.csv") as bithday_file:
     df = pandas.read_csv(bithday_file)
 
+
+
 contains_month = df[df['month'] == todays_month]
 
 month_list = contains_month.values.tolist()
 
+
+## Checks if value in list
 try:
-    real_list = month_list[0]
+    if month_list[0][3] == todays_month:
+
+        real_list = month_list[0]
+
+
+
+        #imports random letter
+
+
+        letter_number = random.randint(1,3)
+
+        with open(f"letter_templates/letter_{letter_number}.txt") as letter:
+            let = letter.read()
+
+
+
+        #Edits the letter with the name
+
+        final_letter = let.replace("[NAME]", real_list[0])
+
+
+        #Checks if todays date match the infor in the list
+
+        if real_list[4] == todays_day and real_list[3] == todays_month:
+            with smtplib.SMTP(host="mail.groundwave.se", port=587) as connection:
+                connection.starttls()
+                connection.login(user=APPS, password=PW)
+                connection.sendmail(from_addr=APPS,
+                                    to_addrs=real_list[1],
+                                    msg=f"Subject:Happy Birthday!\n\n{final_letter}")
 except IndexError:
-    real_list = []
-
-
-#imports random letter
-
-
-letter_number = random.randint(1,3)
-
-with open(f"letter_templates/letter_{letter_number}.txt") as letter:
-    let = letter.read()
-
-
-
-#Edits the letter with the name
-
-final_letter = let.replace("[NAME]", real_list[0])
-
-
-#Checks if todays date match the infor in the list
-
-if real_list[4] == todays_day and real_list[3] == todays_month:
-    with smtplib.SMTP(host="mail.groundwave.se", port=587) as connection:
-        connection.starttls()
-        connection.login(user=APPS, password=PW)
-        connection.sendmail(from_addr=APPS,
-                            to_addrs=real_list[1],
-                            msg=f"Subject:Quote of the week\n\n{random_quote}")
+    print("No birthdays this month")
 
 
